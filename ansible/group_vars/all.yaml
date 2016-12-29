@@ -1,0 +1,17 @@
+docker_images:
+  - "quay.io/coreos/etcd:{{ etcd_version }}"
+  - "nginx"
+  - "gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }}"
+  - "quay.io/coreos/flannel:{{ flannel_version }}"
+  - "quay.io/calico/node:{{ calico_node_version }}"
+  - "calico/cni:{{ calico_cni_version }}"
+  - "calico/kube-policy-controller:{{ calico_kpc_version }}"
+
+etcd_version: v3.0.15
+kubernetes_version: v1.5.1
+flannel_version: v0.6.1
+calico_node_version: v0.22.0
+calico_cni_version: v1.4.2
+calico_kpc_version: v0.3.0
+
+service_cluster_ip_range: "10.3.0.0/24"

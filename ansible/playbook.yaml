@@ -1,0 +1,14 @@
+---
+- hosts: managers
+  become: yes
+  roles:
+    - pki
+    - docker
+    - docker-registry
+    - etcd
+    - kube-manager
+
+- hosts: workers
+  become: yes
+  roles:
+    - docker

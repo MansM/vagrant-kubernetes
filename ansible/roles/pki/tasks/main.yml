@@ -1,0 +1,20 @@
+---
+# tasks file for pki
+- name: retrieve facts 
+  setup: 
+  delegate_to: "{{ groups['managers'][0] }}"
+  delegate_facts: True
+
+- include: ca.yaml
+
+- include: host.yaml
+
+- name: create directory for certs
+  file: path=/etc/certs state=directory mode=0700
+
+- name: copy certs
+  copy: src=../pki/{{ item }} dest=/etc/certs/{{ item }}
+  with_items: 
+    - ca.pem
+    - "host-{{ ansible_hostname }}-key.pem"
+    - "host-{{ ansible_hostname }}.pem"

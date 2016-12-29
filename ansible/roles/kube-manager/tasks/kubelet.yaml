@@ -1,0 +1,20 @@
+---
+- name: get kubelet
+  get_url: 
+    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/kubelet"
+    dest: /usr/bin/kubelet
+
+- name: set permissions for kubelet
+  file: path=/usr/bin/kubelet mode=0755
+
+- name: create kubelet manifest folder
+  file: path=/etc/kubelet.d state=directory
+
+- name: add kubeletservice
+  template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service
+  notify:
+    - daemon-reload
+    - restart kubelet
+
+- name: start and enable kubelet service
+  service: name=kubelet state=started enabled=yes

@@ -1,0 +1,20 @@
+{
+  "CN": "kubernetes",
+  "hosts": [
+    "{{ ansible_hostname }}",
+    "{{ ansible_enp0s8.ipv4.address }}"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "NL",
+      "L": "Amsterdam",
+      "O": "Kubernetes",
+      "OU": "Cluster",
+      "ST": "Noord-Holland"
+    }
+  ]
+}

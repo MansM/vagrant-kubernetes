@@ -1,0 +1,9 @@
+---
+- name: generate ca files
+  shell: cfssl gencert -initca ../ansible/roles/pki/files/ca-csr.json | cfssljson -bare ca
+  args:
+    chdir: ../pki/
+    creates: ../pki/ca.pem
+  delegate_to: 127.0.0.1
+  become: False
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"

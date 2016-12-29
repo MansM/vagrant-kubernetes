@@ -1,0 +1,24 @@
+---
+# tasks file for docker-registry
+- name: create local registry
+  docker_container:
+    name: registry
+    image: registry:2
+    state: started
+    ports:
+     - "5000:5000"
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: get images
+  docker_image:
+    name: "{{ item }}"
+  with_items: "{{ docker_images }}"
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: Tag and push to local registry
+  docker_image:
+     name: "{{ item }}"
+     repository: "{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/{{ item }}"
+     push: yes
+  with_items: "{{ docker_images }}"
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"

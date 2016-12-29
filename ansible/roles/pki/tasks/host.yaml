@@ -1,0 +1,18 @@
+---
+- name: generate host csr
+  template: src=host-csr.json.j2 dest="../pki/host-csr-{{ ansible_hostname }}.json"
+  delegate_to: 127.0.0.1
+  become: False
+
+- name: generate host cert&key
+  shell: cfssl gencert \
+          -ca=ca.pem \
+          -ca-key=ca-key.pem \
+          -config=../ansible/roles/pki/files/ca-config.json \
+          -profile=kubernetes \
+          host-csr-{{ ansible_hostname }}.json | cfssljson -bare host-{{ ansible_hostname }}
+  args:
+    chdir: ../pki/
+    creates: "../pki/host-{{ ansible_hostname }}.pem"
+  delegate_to: 127.0.0.1
+  become: False
