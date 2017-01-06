@@ -1,0 +1,46 @@
+---
+# tasks file for calico
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    reload: yes
+    state: present
+
+- name: add calico service
+  template: src=calico.service.j2 dest=/usr/lib/systemd/system/calico.service
+  notify:
+    - daemon-reload
+    - restart calico
+
+- name: start and enable calico service
+  service: name=calico state=started enabled=yes
+
+- name: create /opt/cni/bin
+  file: path=/opt/cni/bin state=directory
+
+- name: get calico cni
+  get_url: 
+    url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/calico/{{ calico_version }}/{{ item }}"
+    dest: /opt/cni/bin/{{ item }}
+  with_items:
+    - calico
+    - calico-ipam
+
+- name: set execute permissions for calico cni
+  file: path=/opt/cni/bin/{{ item }} state=file mode=0755
+  with_items:
+    - calico
+    - calico-ipam
+
+- name: create /etc/cni/net.d
+  file: path=/etc/cni/net.d state=directory
+
+- name: calico cni config
+  template: src=10-calico.conf.j2 dest=/etc/cni/net.d/10-calico.conf
+
+- name: lo plugin
+  unarchive: src=http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/calico/cni-v0.3.0.tgz dest=/opt/cni/bin/ remote_src=yes
+
+
+  

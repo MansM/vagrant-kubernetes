@@ -2,7 +2,7 @@
   "CN": "kubernetes",
   "hosts": [
     "{{ ansible_hostname }}",
-    "{{ ansible_enp0s8.ipv4.address }}"
+    "{{ ansible_enp0s8['ipv4']['address'] }}"
   ],
   "key": {
     "algo": "rsa",

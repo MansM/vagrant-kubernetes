@@ -1,11 +1,29 @@
 ---
 # tasks file for kube-manager
 
-- include: kubelet.yaml
+# - include: kubelet.yaml
+
+- name: kubectl alias in profile
+  lineinfile: 
+    dest: /root/.bash_profile
+    line: "alias kubectl=\"docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro 
+          {{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} 
+          /hyperkube kubectl 
+          --server https://{{ ansible_enp0s8.ipv4.address }} 
+          --certificate-authority=/etc/kubernetes/ssl/ca.pem 
+          --client-certificate=/etc/kubernetes/ssl//host-{{ ansible_hostname }}.pem 
+          --client-key=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem\""
+    state: present
 
 - debug:
     msg: "http://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':2379,http://') }}:2379"
 
 
-- name: copy apiserver.yaml to kubelet
-  template: src=kube-apiserver.yaml.j2 dest=/etc/kubelet.d/kube-apiserver.yaml
+- name: copy yaml files to kubelet
+  template: src=kube-{{ item }}.yaml.j2 dest=/etc/kubelet.d/kube-{{ item }}.yaml
+  with_items:
+    - apiserver
+    - scheduler
+    - proxy
+    - controller-manager
+

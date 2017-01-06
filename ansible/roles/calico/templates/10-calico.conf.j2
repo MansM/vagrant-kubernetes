@@ -1,0 +1,15 @@
+{
+    "name": "calico-k8s-network",
+    "type": "calico",
+    "etcd_endpoints": "https://172.16.50.11:2379",
+    "log_level": "info",
+    "ipam": {
+        "type": "calico-ipam"
+    },
+    "policy": {
+        "type": "k8s"
+    },
+    "kubernetes": {
+        "kubeconfig": "/etc/kubernetes/kubeconfig.yaml"
+    }
+}

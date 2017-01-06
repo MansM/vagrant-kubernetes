@@ -1,14 +1,27 @@
 ---
+- hosts: manager1
+  become: yes
+  roles:
+    - httpd
+
 - hosts: managers
   become: yes
   roles:
+    - ntp    
     - pki
     - docker
     - docker-registry
+    - kubelet
     - etcd
     - kube-manager
+    - calico
 
 - hosts: workers
   become: yes
   roles:
+    - ntp
+    - pki
     - docker
+    - kubelet
+    - kube-worker
+    - calico

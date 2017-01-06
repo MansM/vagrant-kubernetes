@@ -10,10 +10,10 @@
 - include: host.yaml
 
 - name: create directory for certs
-  file: path=/etc/certs state=directory mode=0700
+  file: path=/etc/kubernetes/ssl state=directory mode=0700
 
 - name: copy certs
-  copy: src=../pki/{{ item }} dest=/etc/certs/{{ item }}
+  copy: src=../pki/{{ item }} dest=/etc/kubernetes/ssl/{{ item }}
   with_items: 
     - ca.pem
     - "host-{{ ansible_hostname }}-key.pem"

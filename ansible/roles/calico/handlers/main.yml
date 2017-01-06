@@ -1,0 +1,7 @@
+---
+# handlers file for calico
+- name: daemon-reload
+  shell: systemctl daemon-reload
+
+- name: restart calico
+  service: name=calico state=restarted

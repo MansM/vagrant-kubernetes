@@ -1,0 +1,39 @@
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/bin/kubelet \
+  --allow-privileged=true \
+  {% if 'workers' in group_names %}
+  --api-servers=https://172.16.50.11:443,https://172.16.50.12:443 \
+  --register-node=true \
+  --register-schedulable=true \
+  {% endif %}
+  {% if 'managers' in group_names %}
+  --register-schedulable=false \
+  {% endif %}
+  --address={{ ansible_enp0s8.ipv4.address }} \
+  --pod-manifest-path=/etc/kubelet.d \
+  --cloud-provider= \
+  --cluster-dns=10.3.0.10 \
+  --cluster-domain=cluster.local \
+  --container-runtime=docker \
+  --docker=unix:///var/run/docker.sock \
+  --cni-conf-dir=/etc/cni/net.d \
+  --network-plugin=cni \
+  --cni-bin-dir=/opt/cni/bin \
+  --kubeconfig=/etc/kubernetes/kubeconfig \
+  --reconcile-cidr=true \
+  --serialize-image-pulls=false \
+  --tls-cert-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem \
+  --tls-private-key-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem \
+  --v={{ loglevel }}
+
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

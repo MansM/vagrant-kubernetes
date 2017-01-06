@@ -1,0 +1,32 @@
+---
+# tasks file for flannel
+- name: docker additional service dir
+  file: path=/etc/systemd/system/docker.service.d state=directory
+
+- name: copy flannel docker config
+  copy: src=40-flannel.conf dest=/etc/systemd/system/docker.service.d/40-flannel.conf
+  notify: 
+    - daemon-reload
+    - restart docker
+
+- name: create folders
+  file: path={{ item }} state=directory
+  with_items:
+    - /etc/kubernetes
+    - /etc/kubernetes/cni
+    - /etc/kubernetes/cni/net.d
+    - /var/run/calico
+    - /opt/cni
+    - /opt/cni/bin
+
+- name: copy docker opts file
+  copy: src=docker_opts_cni.env dest=/etc/kubernetes/cni/docker_opts_cni.env
+
+- name: copy flannel.conf file
+  copy: src=10-flannel.conf dest=/etc/kubernetes/cni/net.d/10-flannel.conf
+
+- name: copy canal to kubelet
+  template: src=canal-2.yaml.j2 dest=/etc/kubelet.d/canal.yaml
+
+- name: set network for flannel
+  shell: set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'

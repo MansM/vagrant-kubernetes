@@ -1,7 +1,8 @@
 ---
+# tasks file for kubelet
 - name: get kubelet
   get_url: 
-    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/kubelet"
+    url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/kubelet"
     dest: /usr/bin/kubelet
 
 - name: set permissions for kubelet

@@ -1,0 +1,6 @@
+---
+- hosts: manager1
+  become: yes
+  roles:
+    - httpd
+    - flannel

@@ -1,69 +1,52 @@
 ---
 # tasks file for etcd
-- name: start etcd on manager
-  docker_container:
-    name: etcd
-    image: "{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/quay.io/coreos/etcd:{{ etcd_version }}"
-    ports:
-     - "2379:2379"
-     - "2380:2380"
-    volumes:
-      - /etc/certs:/etc/certs:ro
-    env:
-      ETCD_ADVERTISE_CLIENT_URLS=https://{{ ansible_enp0s8.ipv4.address }}:2379
-      ETCD_INITIAL_ADVERTISE_PEER_URLS=https://{{ ansible_enp0s8.ipv4.address }}:2380
-      ETCD_INITIAL_CLUSTER="{{ ansible_hostname }}=https://{{ ansible_enp0s8.ipv4.address }}:2380"
-      ETCD_INITIAL_CLUSTER_STATE=new
-      ETCD_LISTEN_CLIENT_URLS="https://0.0.0.0:2379"
-      ETCD_LISTEN_PEER_URLS="https://0.0.0.0:2380"
-      ETCD_NAME={{ ansible_hostname }}
-      ETCD_PEER_AUTO_TLS=true
-      ETCD_CERT_FILE=/etc/certs/host-"{{ ansible_hostname }}.pem"
-      ETCD_KEY_FILE=/etc/certs/host-"{{ ansible_hostname }}-key.pem"
-      ETCD_CLIENT_CERT_AUTH=false
-      ETCD_TRUSTED_CA_FILE=/etc/certs/ca.pem
-      # ETCD_AUTO_TLS=true
-      # TLS DISABLED BECAUSE OF CANT CHECK
+
+- name: create kubelet manifest folder
+  file: path=/etc/kubelet.d state=directory
+
+- name: put etcd in kubeletfolder
+  template: src=etcd.yaml.j2 dest=/etc/kubelet.d/etcd.yaml
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- wait_for:
+    host: "{{ ansible_enp0s8.ipv4.address }}"
+    port: 2380
+    delay: 10
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- wait_for:
+    host: "{{ ansible_enp0s8.ipv4.address }}"
+    port: 2379
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - name: retrieve etcd_memberlist
-  shell: docker exec -i etcd etcdctl --endpoints=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2379 --ca-file=/etc/certs/ca.pem member list
+  shell: docker exec -i `docker ps -q --filter label=io.kubernetes.container.name=etcd` etcdctl --endpoints=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2379 --ca-file=/etc/kubernetes/ssl/ca.pem member list
   changed_when: False
   delegate_to: "{{ groups['managers'][0] }}"
   register: etcd_members
 
+- debug:
+    msg: "{{ etcd_members.stdout_lines }}"
+
 - name: adding secondairy manager to etcd cluster
-  shell: docker exec -i etcd etcdctl --endpoints=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2379 --ca-file=/etc/certs/ca.pem member add {{ ansible_hostname }} https://{{ ansible_enp0s8.ipv4.address }}:2380
+  shell: docker exec -i `docker ps -q --filter label=io.kubernetes.container.name=etcd` etcdctl --endpoints=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2379 --ca-file=/etc/kubernetes/ssl/ca.pem member add {{ ansible_hostname }} https://{{ ansible_enp0s8.ipv4.address }}:2380
   delegate_to: "{{ groups['managers'][0] }}"
   register: etcd_data
   when: "{{ groups['managers'] | length }} > 1 and ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname'] and 
         etcd_members.stdout.find( ansible_hostname ) == -1" 
 
-- name: start etcd on secondairy manager
-  docker_container:
-    name: etcd
-    image: "{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/quay.io/coreos/etcd:{{ etcd_version }}"
-    volumes:
-      - /etc/certs:/etc/certs:ro
-    ports:
-     - "2379:2379"
-     - "2380:2380"
-    env:
-      ETCD_ADVERTISE_CLIENT_URLS=https://{{ ansible_enp0s8.ipv4.address }}:2379
-      ETCD_INITIAL_ADVERTISE_PEER_URLS=https://{{ ansible_enp0s8.ipv4.address }}:2380
-      ETCD_INITIAL_CLUSTER="{{ ansible_hostname }}=https://{{ ansible_enp0s8.ipv4.address }}:2380"
-      ETCD_INITIAL_CLUSTER_STATE=existing
-      ETCD_LISTEN_CLIENT_URLS="https://0.0.0.0:2379"
-      ETCD_LISTEN_PEER_URLS="https://0.0.0.0:2380"
-      {{ etcd_data.stdout_lines[2]}}
-      {{ etcd_data.stdout_lines[3]}}
-      {{ etcd_data.stdout_lines[4]}}
-      ETCD_PEER_AUTO_TLS=true
-      ETCD_CERT_FILE=/etc/certs/host-"{{ ansible_hostname }}.pem"
-      ETCD_KEY_FILE=/etc/certs/host-"{{ ansible_hostname }}-key.pem"
-      ETCD_CLIENT_CERT_AUTH=false
-      ETCD_TRUSTED_CA_FILE=/etc/certs/ca.pem
-      # ETCD_AUTO_TLS=true
-      # TLS DISABLED BECAUSE OF CANT CHECK
-  when: "ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname'] and
-  etcd_members.stdout.find( ansible_hostname ) == -1"
+- debug:
+    msg: "{{ etcd_data.stdout_lines }}"
+  when: "{{ groups['managers'] | length }} > 1 and ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname'] and 
+        etcd_members.stdout.find( ansible_hostname ) == -1" 
+
+- name: put etcd in kubeletfolder
+  template: src=etcd-secondairy.yaml.j2 dest=/etc/kubelet.d/etcd.yaml
+  when: "ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: etcdctl alias in profile
+  lineinfile: 
+    dest: /root/.bash_profile
+    line: "alias etcdctl=\"docker exec -it 
+          $(docker ps -q --filter label=io.kubernetes.container.name=etcd)
+          etcdctl --endpoints=https://172.16.50.11:2379 --ca-file=/etc/kubernetes/ssl/ca.pem\""
