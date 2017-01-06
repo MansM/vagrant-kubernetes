@@ -9,7 +9,7 @@
     line: "alias kubectl=\"docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro 
           {{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} 
           /hyperkube kubectl 
-          --server https://{{ ansible_enp0s8.ipv4.address }} 
+          --server http://{{ ansible_enp0s8.ipv4.address }}:8080 
           --certificate-authority=/etc/kubernetes/ssl/ca.pem 
           --client-certificate=/etc/kubernetes/ssl//host-{{ ansible_hostname }}.pem 
           --client-key=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem\""
@@ -22,8 +22,27 @@
 - name: copy yaml files to kubelet
   template: src=kube-{{ item }}.yaml.j2 dest=/etc/kubelet.d/kube-{{ item }}.yaml
   with_items:
-    - apiserver
     - scheduler
-    - proxy
     - controller-manager
+#    - proxy
+#    - apiserver
 
+- name: get kubernetes binaries
+  get_url: 
+    url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/{{ item }}"
+    dest: /usr/bin/{{ item }}
+  with_items:
+    - kube-apiserver
+
+- name: set permissions for binaries
+  file: path=/usr/bin/{{ item }} mode=0755
+  with_items:
+    - kube-apiserver
+
+- name: add services 
+  template: src={{ item }}.service.j2 dest=/usr/lib/systemd/system/{{ item }}.service
+  notify:
+    - daemon-reload
+    - "restart {{ item }}"
+  with_items:
+    - kube-apiserver    

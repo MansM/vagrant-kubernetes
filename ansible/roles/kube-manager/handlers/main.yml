@@ -3,5 +3,5 @@
 - name: daemon-reload
   shell: systemctl daemon-reload
 
-- name: restart kubelet
-  service: name=kubelet state=restarted
+- name: restart kube-apiserver
+  service: name=kube-apiserver state=restarted

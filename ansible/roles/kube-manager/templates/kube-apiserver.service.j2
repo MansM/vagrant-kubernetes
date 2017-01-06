@@ -1,0 +1,31 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/bin/kube-apiserver \
+  --admission-control=AlwaysAdmit \
+  --advertise-address={{ ansible_enp0s8.ipv4.address }} \
+  --allow-privileged=true \
+  --apiserver-count=2 \
+  --authorization-mode=AlwaysAllow \
+  --bind-address={{ ansible_enp0s8.ipv4.address }} \
+  --enable-swagger-ui=true \
+  --etcd-cafile=/etc/kubernetes/ssl/ca.pem \
+  --insecure-bind-address={{ ansible_enp0s8.ipv4.address }} \
+  --kubelet-certificate-authority=/etc/kubernetes/ssl/ca.pem \
+  --etcd-servers=https://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':2379,https://') }}:2379 \
+  --service-account-key-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem \
+  --service-cluster-ip-range={{ SERVICE_IP_RANGE }} \
+  --service-node-port-range=30000-32767 \
+  --tls-cert-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem \
+  --tls-private-key-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem \
+  --v={{ loglevel }} \
+  --secure-port=443 \
+  --insecure-port=8080 \
+  --anonymous-auth=true
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

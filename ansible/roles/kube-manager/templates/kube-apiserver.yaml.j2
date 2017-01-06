@@ -18,7 +18,7 @@ spec:
     - --etcd-certfile=/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem
     - --etcd-keyfile=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem
     - --allow-privileged=true
-    - --service-cluster-ip-range={{ service_cluster_ip_range }}
+    - --service-cluster-ip-range={{ SERVICE_IP_RANGE }}
     - --secure-port=443
     - --insecure-port=8080 
     - --advertise-address={{ ansible_enp0s8.ipv4.address }}

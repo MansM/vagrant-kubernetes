@@ -11,8 +11,12 @@
 
 - name: get kubelet
   get_url: 
-    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/kubelet"
-    dest: "/var/www/html/kubernetes/{{ kubernetes_version }}/kubelet"
+    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/{{ item }}"
+    dest: "/var/www/html/kubernetes/{{ kubernetes_version }}/{{ item }}"
+  with_items:
+    - kubelet
+    - kube-apiserver
+    - kube-proxy
 
 - name: create calico version dir
   file: path=/var/www/html/calico/{{ calico_version }} state=directory

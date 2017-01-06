@@ -1,2 +1,7 @@
 ---
 # handlers file for kube-worker
+- name: daemon-reload
+  shell: systemctl daemon-reload
+
+- name: restart kube-proxy
+  service: name=kube-proxy state=restarted

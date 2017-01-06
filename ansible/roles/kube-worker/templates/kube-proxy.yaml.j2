@@ -11,9 +11,9 @@ spec:
     command:
     - /hyperkube
     - proxy
-    - --master=https://172.16.50.11:443
+    - --master=http://172.16.50.11:8080
     - --kubeconfig=/etc/kubernetes/kubeconfig.yaml
-    - --hostname-override={{ ansible_enp0s8.ipv4.address }}
+    - --hostname-override={{ ansible_hostname }}
     - --bind-address=0.0.0.0
     - --proxy-mode=iptables
     - --v={{ loglevel }}

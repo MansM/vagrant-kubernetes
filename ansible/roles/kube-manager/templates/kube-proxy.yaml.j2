@@ -11,7 +11,7 @@ spec:
     command:
     - /hyperkube
     - proxy
-    - --master=http://127.0.0.1:8080
+    - --master=http://{{ ansible_enp0s8.ipv4.address }}:8080
     - --proxy-mode=iptables
     - --v={{ loglevel }}
     securityContext:

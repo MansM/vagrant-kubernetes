@@ -1,0 +1,18 @@
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/bin/kube-proxy \
+  --master=http://172.16.50.11:8080 \
+  --kubeconfig=/etc/kubernetes/kubeconfig.yaml \
+  --hostname-override={{ ansible_hostname }} \
+  --proxy-mode=iptables \
+  --cluster-cidr=10.200.0.0/24 \
+  --v={{ loglevel }}
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

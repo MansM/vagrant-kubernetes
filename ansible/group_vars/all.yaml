@@ -15,6 +15,10 @@ calico_node_version: v1.0.0-6-gf9f3c1a
 calico_cni_version: v1.5.5-2-gfae031e
 calico_kpc_version: v0.5.1-6-gbb74a13
 
-service_cluster_ip_range: "10.3.0.0/24"
+service_cluster_ip_range: "10.32.0.0/24"
+POD_NETWORK: "10.2.0.0/16"
+SERVICE_IP_RANGE: "10.3.0.0/24"
+K8S_SERVICE_IP: "10.3.0.1"
+DNS_SERVICE_IP: "10.3.0.10"
 
-loglevel: 4
+loglevel: 2

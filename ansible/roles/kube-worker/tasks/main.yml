@@ -3,8 +3,28 @@
 - name: kube-worker config
   template: src=worker-kubeconfig.yaml dest=/etc/kubernetes/kubeconfig.yaml
 
-- name: kube-proxy to kubelet
-  template: src=kube-proxy.yaml.j2 dest=/etc/kubelet.d/kube-proxy.yaml
+# - name: kube-proxy to kubelet
+#   template: src=kube-proxy.yaml.j2 dest=/etc/kubelet.d/kube-proxy.yaml
+
+- name: get kubernetes binaries
+  get_url: 
+    url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/{{ item }}"
+    dest: /usr/bin/{{ item }}
+  with_items:
+    - kube-proxy
+
+- name: set permissions for binaries
+  file: path=/usr/bin/{{ item }} mode=0755
+  with_items:
+    - kube-proxy
+
+- name: add services 
+  template: src={{ item }}.service.j2 dest=/usr/lib/systemd/system/{{ item }}.service
+  notify:
+    - daemon-reload
+    - "restart {{ item }}"
+  with_items:
+    - kube-proxy
 # - kubelet
 # - proxy
 # - kubeconfig

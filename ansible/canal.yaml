@@ -3,4 +3,9 @@
   become: yes
   roles:
     - httpd
-    - flannel
+
+- hosts: managers
+  become: yes
+  roles:
+    - kubelet
+    - kube-manager
