@@ -2,6 +2,9 @@
     "name": "calico-k8s-network",
     "type": "calico",
     "etcd_endpoints": "https://172.16.50.11:2379",
+    "etcd_ca_cert_file": "/etc/kubernetes/ssl/ca.pem",
+    "etcd_cert_file": "/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem",
+    "etcd_key_file": "//etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem",
     "log_level": "info",
     "ipam": {
         "type": "calico-ipam"
