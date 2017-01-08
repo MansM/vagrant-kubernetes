@@ -18,3 +18,9 @@
     - ca.pem
     - "host-{{ ansible_hostname }}-key.pem"
     - "host-{{ ansible_hostname }}.pem"
+
+- name: creating symlinks
+  file: src=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem dest=/etc/kubernetes/ssl/host-key.pem state=link
+
+- name: creating symlinks
+  file: src=/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem dest=/etc/kubernetes/ssl/host.pem state=link

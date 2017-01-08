@@ -1,7 +1,16 @@
 ---
-# tasks file for flannel
+# tasks file for flannel  
+- name: getting the binaries
+  unarchive: src="http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz" dest=/usr/bin copy=no owner=root
+
 - name: docker additional service dir
   file: path=/etc/systemd/system/docker.service.d state=directory
+
+- name: set service file
+  template: src=flannel.service.j2 dest=/usr/lib/systemd/system/flannel.service
+
+- name: set sysconfig
+  template: src=sysconfig.j2 dest=/etc/sysconfig/flannel
 
 - name: copy flannel docker config
   copy: src=40-flannel.conf dest=/etc/systemd/system/docker.service.d/40-flannel.conf
@@ -15,18 +24,39 @@
     - /etc/kubernetes
     - /etc/kubernetes/cni
     - /etc/kubernetes/cni/net.d
+    - /etc/cni/net.d
     - /var/run/calico
     - /opt/cni
     - /opt/cni/bin
 
 - name: copy docker opts file
-  copy: src=docker_opts_cni.env dest=/etc/kubernetes/cni/docker_opts_cni.env
+  copy: src=docker_opts_cni.env dest=/etc/cni/net.d/docker_opts_cni.env
 
 - name: copy flannel.conf file
-  copy: src=10-flannel.conf dest=/etc/kubernetes/cni/net.d/10-flannel.conf
+  copy: src=10-flannel.conf dest=/etc/cni/net.d/10-flannel.conf
+
+
 
 - name: copy canal to kubelet
-  template: src=canal-2.yaml.j2 dest=/etc/kubelet.d/canal.yaml
+  template: src=canal-2.yaml.j2 dest=/root/canal.yaml
 
 - name: set network for flannel
-  shell: set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
+  shell: "/bin/docker exec -i $(docker ps -q --filter label=io.kubernetes.container.name=etcd) etcdctl --endpoints=https://172.16.50.11:2379 --ca-file=/etc/kubernetes/ssl/ca.pem set /coreos.com/network/config '{ \"Network\": \"10.1.0.0/16\" }'"
+  args:
+    executable: /bin/bash
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: start and enable service
+  service: name=flannel enabled=yes state=started
+
+- wait_for:
+    host: "{{ ansible_enp0s8.ipv4.address }}"
+    port: 443
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: setup canal
+  shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.1 /hyperkube kubectl --server https://172.16.50.11 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem apply -f /mount/canal.yaml"
+  args:
+    executable: /bin/bash
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+

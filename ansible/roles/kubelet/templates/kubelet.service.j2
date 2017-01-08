@@ -7,7 +7,7 @@ Requires=docker.service
 ExecStart=/usr/bin/kubelet \
   --allow-privileged=true \
   {% if 'workers' in group_names %}
-  --api-servers=http://172.16.50.11:8080,http://172.16.50.12:8080 \
+  --api-servers=https://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':443,https://') }}:443 \
   --register-node=true \
   --register-schedulable=true \
   --require-kubeconfig=true \

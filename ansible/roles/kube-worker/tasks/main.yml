@@ -1,7 +1,7 @@
 ---
 # tasks file for kube-worker
 - name: kube-worker config
-  template: src=worker-kubeconfig.yaml dest=/etc/kubernetes/kubeconfig.yaml
+  template: src=kubeconfig.yaml.j2 dest=/etc/kubernetes/kubeconfig.yaml
 
 # - name: kube-proxy to kubelet
 #   template: src=kube-proxy.yaml.j2 dest=/etc/kubelet.d/kube-proxy.yaml

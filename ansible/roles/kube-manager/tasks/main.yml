@@ -45,4 +45,9 @@
     - daemon-reload
     - "restart {{ item }}"
   with_items:
-    - kube-apiserver    
+    - kube-apiserver
+
+- name: services starten
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - kube-apiserver 

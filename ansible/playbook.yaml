@@ -14,7 +14,8 @@
     - kubelet
     - etcd
     - kube-manager
-    - calico
+    - flannel
+#    - calico
 
 - hosts: workers
   become: yes
@@ -24,4 +25,5 @@
     - docker
     - kubelet
     - kube-worker
-    - calico
+    - flannel
+

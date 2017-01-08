@@ -6,7 +6,11 @@ metadata:
   namespace: kube-system
 data:
   # Configure this with the location of your etcd cluster.
-  etcd_endpoints: "https://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':2379,https://') }}:2379"
+  #etcd_endpoints: "https://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':2379,https://') }}:2379"
+  etcd_endpoints: "https://172.16.50.11:2379"
+  etcd_ca_cert_file: "/etc/kubernetes/ssl/ca.pem"
+  etcd_cert_file: "/etc/kubernetes/ssl/host.pem"
+  etcd_key_file: "/etc/kubernetes/ssl/host-key.pem"
 
   # The CNI network configuration to install on each node.  The special
   # values in this config will be automatically populated.
@@ -17,6 +21,9 @@ data:
         "delegate": {
           "type": "calico",
           "etcd_endpoints": "__ETCD_ENDPOINTS__",
+          "etcd_key_file": "/etc/kubernetes/ssl/host-key.pem",
+          "etcd_cert_file": "/etc/kubernetes/ssl/host.pem",
+          "etcd_ca_cert_file": "/etc/kubernetes/ssl/ca.pem",
           "log_level": "info",
           "policy": {
               "type": "k8s",
@@ -24,7 +31,7 @@ data:
               "k8s_auth_token": "__SERVICEACCOUNT_TOKEN__"
           },
           "kubernetes": {
-              "kubeconfig": "/etc/kubernetes/cni/net.d/__KUBECONFIG_FILENAME__"
+              "kubeconfig": "/etc/cni/net.d/__KUBECONFIG_FILENAME__"
           }
         }
     }
@@ -70,6 +77,16 @@ spec:
                   name: calico-config
                   key: etcd_endpoints
             # Choose the backend to use.
+            - name: ETCD_AUTHORITY
+              value: "172.16.50.11:2379"
+            - name: ETCD_SCHEME
+              value: "https "
+            - name: ETCD_KEY_FILE
+              value: "/etc/kubernetes/ssl/host-key.pem"
+            - name: ETCD_CERT_FILE
+              value: "/etc/kubernetes/ssl/host.pem"
+            - name: ETCD_CA_CERT_FILE
+              value: "/etc/kubernetes/ssl/ca.pem"
             - name: CALICO_NETWORKING_BACKEND
               value: "none"
             # Disable file logging so `kubectl logs` works.
@@ -89,6 +106,9 @@ spec:
             - mountPath: /etc/resolv.conf
               name: dns
               readOnly: true
+            - mountPath: /etc/kubernetes/ssl
+              name: ssl-certs-kubernetes
+              readOnly: true
         # This container installs the Calico CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
@@ -105,6 +125,16 @@ spec:
                 configMapKeyRef:
                   name: calico-config
                   key: etcd_endpoints
+            - name: ETCD_AUTHORITY
+              value: "172.16.50.11:2379"
+            - name: ETCD_SCHEME
+              value: "https "
+            - name: ETCD_KEY_FILE
+              value: "/etc/kubernetes/ssl/host-key.pem"
+            - name: ETCD_CERT_FILE
+              value: "/etc/kubernetes/ssl/host.pem"
+            - name: ETCD_CA_CERT_FILE
+              value: "/etc/kubernetes/ssl/ca.pem"
             # The CNI network config to install on each node.
             - name: CNI_NETWORK_CONFIG
               valueFrom:
@@ -116,6 +146,9 @@ spec:
               name: cni-bin-dir
             - mountPath: /host/etc/cni/net.d
               name: cni-net-dir
+            - mountPath: /etc/kubernetes/ssl
+              name: ssl-certs-kubernetes
+              readOnly: true
       volumes:
         # Used by calico/node.
         - name: lib-modules
@@ -130,10 +163,13 @@ spec:
             path: /opt/cni/bin
         - name: cni-net-dir
           hostPath:
-            path: /etc/kubernetes/cni/net.d
+            path: /etc/cni/net.d
         - name: dns
           hostPath:
             path: /etc/resolv.conf
+        - hostPath:
+            path: /etc/kubernetes/ssl
+          name: ssl-certs-kubernetes
 
 ---
 
@@ -174,6 +210,16 @@ spec:
                 configMapKeyRef:
                   name: calico-config
                   key: etcd_endpoints
+            - name: ETCD_AUTHORITY
+              value: "172.16.50.11:2379"
+            - name: ETCD_SCHEME
+              value: "https "
+            - name: ETCD_KEY_FILE
+              value: "/etc/kubernetes/ssl/host-key.pem"
+            - name: ETCD_CERT_FILE
+              value: "/etc/kubernetes/ssl/host.pem"
+            - name: ETCD_CA_CERT_FILE
+              value: "/etc/kubernetes/ssl/ca.pem"
             # The location of the Kubernetes API.  Use the default Kubernetes
             # service for API access.
             - name: K8S_API
@@ -183,3 +229,11 @@ spec:
             # kubernetes.default to the correct service clusterIP.
             - name: CONFIGURE_ETC_HOSTS
               value: "true"
+          volumeMounts:
+            - mountPath: /etc/kubernetes/ssl
+              name: ssl-certs-kubernetes
+              readOnly: true
+      volumes:
+        - hostPath:
+            path: /etc/kubernetes/ssl
+          name: ssl-certs-kubernetes

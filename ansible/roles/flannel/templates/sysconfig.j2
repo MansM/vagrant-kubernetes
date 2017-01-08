@@ -1,0 +1,17 @@
+FLANNELD_IFACE={{ ansible_enp0s8.ipv4.address }}
+
+# Flanneld configuration options
+
+# etcd url location.  Point this to the server where etcd runs
+FLANNEL_ETCD_ENDPOINTS="https://172.16.50.11:2379"
+FLANNEL_ETCD_KEYFILE="/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem"
+FLANNEL_ETCD_CERTFILE="/etc/kubernetes/ssl/host-{{ ansible_hostname }}.pem"
+FLANNEL_ETCD_CAFILE="/etc/kubernetes/ssl/ca.pem"
+
+
+# etcd config key.  This is the configuration key that flannel queries
+# For address range assignment
+FLANNEL_ETCD_PREFIX="/coreos.com/network"
+
+# Any additional options that you want to pass
+#FLANNEL_OPTIONS=""

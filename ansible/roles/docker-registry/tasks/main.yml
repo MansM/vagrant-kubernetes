@@ -13,6 +13,7 @@
 - name: get images
   docker_image:
     name: "{{ item }}"
+  retries: 5
   with_items: "{{ docker_images }}"
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
