@@ -20,7 +20,13 @@ spec:
     - mountPath: /etc/ssl/certs
       name: ssl-certs-host
       readOnly: true
+    - mountPath: /etc/kubernetes/kubeconfig.yaml
+      name: etc-kubernetes-kubeconfig
+      readOnly: true
   volumes:
   - hostPath:
       path: /usr/share/ca-certificates
     name: ssl-certs-host
+  - hostPath:
+      path: /etc/kubernetes/kubeconfig.yaml
+    name: etc-kubernetes-kubeconfig

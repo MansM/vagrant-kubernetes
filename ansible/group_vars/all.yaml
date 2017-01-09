@@ -22,3 +22,4 @@ K8S_SERVICE_IP: "10.3.0.1"
 DNS_SERVICE_IP: "10.3.0.10"
 
 loglevel: 2
+kube_token: DeevDJEMJnxQPb4Pse9QHBWt

@@ -13,11 +13,13 @@
   get_url: 
     url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/{{ item }}"
     dest: "/var/www/html/kubernetes/{{ kubernetes_version }}/{{ item }}"
+  retries: 5
+  register: get_url_result
+  until: get_url_result | succeeded
   with_items:
     - kubelet
     - kube-apiserver
     - kube-proxy
-  retries: 5
 
 - name: create calico version dir
   file: path=/var/www/html/calico/{{ calico_version }} state=directory
@@ -27,6 +29,8 @@
     url: "https://github.com/projectcalico/calico-cni/releases/download/{{ calico_version }}/{{ item }}"
     dest: "/var/www/html/calico/{{ calico_version }}/{{ item }}"
   retries: 5
+  register: get_url_result
+  until: get_url_result | succeeded
   with_items:
     - calico
     - calico-ipam
@@ -36,6 +40,8 @@
     url: "https://github.com/containernetworking/cni/releases/download/v0.3.0/cni-v0.3.0.tgz"
     dest: "/var/www/html/calico/cni-v0.3.0.tgz"
   retries: 5
+  register: get_url_result
+  until: get_url_result | succeeded
 
 - name: create flannel dir
   file: path=/var/www/html/flannel/{{ flannel_version }} state=directory
@@ -45,6 +51,8 @@
     url: "https://github.com/coreos/flannel/releases/download/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz"
     dest: /var/www/html/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz
   retries: 5
+  register: get_url_result
+  until: get_url_result | succeeded
 
 
 
