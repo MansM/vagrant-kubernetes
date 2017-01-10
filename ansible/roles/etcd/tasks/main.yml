@@ -28,7 +28,7 @@
 - debug:
     msg: "{{ etcd_members.stdout_lines }}"
 
-- name: adding secondairy manager to etcd cluster
+- name: adding secondary manager to etcd cluster
   shell: docker exec -i `docker ps -q --filter label=io.kubernetes.container.name=etcd` etcdctl --endpoints=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2379 --ca-file=/etc/kubernetes/ssl/ca.pem member add {{ ansible_hostname }} https://{{ ansible_enp0s8.ipv4.address }}:2380
   delegate_to: "{{ groups['managers'][0] }}"
   register: etcd_data
@@ -41,7 +41,7 @@
         etcd_members.stdout.find( ansible_hostname ) == -1" 
 
 - name: put etcd in kubeletfolder
-  template: src=etcd-secondairy.yaml.j2 dest=/etc/kubelet.d/etcd.yaml
+  template: src=etcd-secondary.yaml.j2 dest=/etc/kubelet.d/etcd.yaml
   when: "ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - name: etcdctl alias in profile
