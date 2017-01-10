@@ -1,8 +1,0 @@
-- hosts: workers
-  become: yes
-  roles:
-    - ntp
-    - pki
-    - docker
-    - kubelet
-    - kube-worker

@@ -1,5 +1,13 @@
 ---
-# tasks file for flannel  
+# first flannel install then calico, makes canal
+- name: enable forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    reload: yes
+    state: present
+
 - name: getting the binaries
   unarchive: src="http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz" dest=/usr/bin copy=no owner=root
 
@@ -38,7 +46,7 @@
 
 
 - name: copy canal.yaml to host
-  template: src=canal-2.yaml.j2 dest=/root/canal.yaml
+  template: src=canal.yaml.j2 dest=/root/canal.yaml
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - name: set network for flannel

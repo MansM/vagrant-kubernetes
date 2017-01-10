@@ -1,6 +1,0 @@
----
-- hosts: managers[-1]
-  become: yes
-  tasks:
-    - name: test
-      shell: echo "hello world"

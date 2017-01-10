@@ -4,7 +4,7 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart=/usr/bin/kube-apiserver \
-  --admission-control=AlwaysAdmit \
+  --admission-control=AlwaysAdmit,ServiceAccount \
   --advertise-address={{ ansible_enp0s8.ipv4.address }} \
   --allow-privileged=true \
   --apiserver-count=2 \

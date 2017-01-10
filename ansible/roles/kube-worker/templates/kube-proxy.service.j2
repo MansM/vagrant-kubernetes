@@ -4,7 +4,7 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart=/usr/bin/kube-proxy \
-  --master=http://172.16.50.11:8080 \
+  --master=https://172.16.50.11:443 \
   --kubeconfig=/etc/kubernetes/kubeconfig.yaml \
   --hostname-override={{ ansible_hostname }} \
   --proxy-mode=iptables \

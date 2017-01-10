@@ -1,0 +1,9 @@
+- hosts: all
+  become: ye
+  vars:
+    nic: enp0s8
+    ip: "ansible_{{ nic }}.ipv4.address"
+
+  tasks:
+    - debug:
+        msg: "{{ {{ ip }} }}"

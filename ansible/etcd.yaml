@@ -1,5 +1,0 @@
----
-- hosts: managers
-  become: yes
-  roles:
-    - etcd
