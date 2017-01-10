@@ -7,15 +7,27 @@ review settings in ansible/host_vars && Vagrantfile
 vagrant up
 
 ## usefull commands
- 
-* docker exec -i `docker ps -q --filter label=io.kubernetes.container.name=etcd` etcdctl --endpoints=https://172.16.50.11:2379 --ca-file=/etc/kubernetes/ssl/ca.pem member list
 
-* docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.1 /hyperkube kubectl --server https://172.16.50.11 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem get componentstatuses
+show etcd member list
 
+``` 
+docker exec -i `docker ps -q --filter label=io.kubernetes.container.name=etcd` etcdctl --endpoints=https://172.16.50.11:2379 --ca-file=/etc/kubernetes/ssl/ca.pem member list
+```
+
+show kubernetes component statuses
+```
+docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.1 /hyperkube kubectl --server https://172.16.50.11 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem get componentstatuses
+```
+
+kubectl create -f /mount/whatever.yaml
+```
 docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v ${PWD}:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.1 /hyperkube kubectl --server https://172.16.50.11 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem create -f /mount/canal.yaml
+```
 
 ## Todo:
-* canal.yaml will not contain all the etcd hosts maybe I can fix this with using host [-1]
+* Getting everything back on the secure api ports
+* Implement ServiceAccounts for nginx ingress controller
+* Add some addons like logging (fluentd, etc)
 
 
 ## usefull stuff
