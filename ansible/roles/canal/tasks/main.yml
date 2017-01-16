@@ -43,12 +43,6 @@
 - name: copy flannel.conf file
   copy: src=10-flannel.conf dest=/etc/cni/net.d/10-flannel.conf
 
-
-
-- name: copy canal.yaml to host
-  template: src=canal.yaml.j2 dest=/root/canal.yaml
-  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
-
 - name: set network for flannel
   shell: "/bin/docker exec -i $(docker ps -q --filter label=io.kubernetes.container.name=etcd) etcdctl --endpoints=https://172.16.50.11:2379 --ca-file=/etc/kubernetes/ssl/ca.pem set /coreos.com/network/config '{ \"Network\": \"10.1.0.0/16\" }'"
   args:
@@ -58,13 +52,20 @@
 - name: start and enable service
   service: name=flannel enabled=yes state=started
 
+
+- name: copy canal.yaml to host
+  template: src=canal.yaml.j2 dest=/root/canal.yaml
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+
+
 - wait_for:
     host: "{{ ansible_enp0s8.ipv4.address }}"
     port: 443
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - name: setup canal
-  shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.1 /hyperkube kubectl --server https://{{ ansible_enp0s8.ipv4.address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
+  shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ansible_enp0s8.ipv4.address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
   args:
     executable: /bin/bash
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"

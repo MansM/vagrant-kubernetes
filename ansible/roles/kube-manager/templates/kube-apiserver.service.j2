@@ -12,7 +12,6 @@ ExecStart=/usr/bin/kube-apiserver \
   --bind-address={{ ansible_enp0s8.ipv4.address }} \
   --enable-swagger-ui=true \
   --etcd-cafile=/etc/kubernetes/ssl/ca.pem \
-  --insecure-bind-address={{ ansible_enp0s8.ipv4.address }} \
   --kubelet-certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --etcd-servers=https://{{ groups['managers'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(':2379,https://') }}:2379 \
   --service-account-key-file=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem \

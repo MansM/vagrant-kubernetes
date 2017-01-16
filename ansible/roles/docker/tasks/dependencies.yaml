@@ -1,8 +1,14 @@
 - name: install epel
   yum: name=epel-release state=present 
+  retries: 5
+  register: yum_epel_result
+  until: yum_epel_result | succeeded
 
 - name: install python-pip  
   yum: name=python-pip state=present
+  retries: 5
+  register: yum_pip_result
+  until: yum_pip_result | succeeded
 
 - name: docker py install
   pip: name=docker-py state=present

@@ -2,20 +2,30 @@
 # tasks file for docker
 - name: install docker-repo
   copy: src=docker.repo dest=/etc/yum.repos.d/docker.repo mode=644
+
 - name: install docker
   yum: name=docker-engine state=present
+  retries: 5
+  register: yum_docker_result
+  until: yum_docker_result | succeeded
+
+
 - name: install other docker dependencies for ansible
   include: dependencies.yaml
+
 - name: create docker service.d dir
   file: dest=/etc/systemd/system/docker.service.d state=directory mode=755
+
 - name: retrieve facts (needed to fill config file of docker (insecure registry))
   setup: 
   delegate_to: "{{ groups['managers'][0] }}"
   delegate_facts: True
+
 - name: add docker config
   template: src=docker.conf.j2 dest=/etc/systemd/system/docker.service.d/docker.conf mode=644
   notify:
     - daemon reload
     - restart docker
+    
 - name: docker service starten en enablen
   service: name=docker enabled=yes state=started

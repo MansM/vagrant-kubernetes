@@ -6,14 +6,14 @@ docker_images:
   - "calico/cni:{{ calico_cni_version }}"
   - "calico/kube-policy-controller:{{ calico_kpc_version }}"
 
-etcd_version: v3.0.15
-kubernetes_version: v1.5.1
-flannel_version: v0.6.2
+etcd_version: v3.0.16
+kubernetes_version: v1.5.2
+flannel_version: v0.7.0
 calico_version: v1.5.5
-calico_node_version: v1.0.0-6-gf9f3c1a
+calico_node_version: v1.0.0
 
-calico_cni_version: v1.5.5-2-gfae031e
-calico_kpc_version: v0.5.1-6-gbb74a13
+calico_cni_version: v1.5.5
+calico_kpc_version: v0.5.1
 
 service_cluster_ip_range: "10.32.0.0/24"
 POD_NETWORK: "10.2.0.0/16"
@@ -23,3 +23,4 @@ DNS_SERVICE_IP: "10.3.0.10"
 
 loglevel: 2
 kube_token: DeevDJEMJnxQPb4Pse9QHBWt
+kube_config: /etc/kubernetes/kubeconfig.yaml

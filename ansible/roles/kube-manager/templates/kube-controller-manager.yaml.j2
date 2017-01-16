@@ -11,7 +11,7 @@ spec:
     command:
     - /hyperkube
     - controller-manager
-    - --master=http://{{ ansible_enp0s8.ipv4.address }}:8080
+    - --master=http://127.0.0.1:8080
     - --leader-elect=true
     - --service-account-private-key-file=/etc/kubernetes/ssl/host-{{ansible_hostname}}-key.pem
     - --root-ca-file=/etc/kubernetes/ssl/ca.pem

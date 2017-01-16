@@ -9,7 +9,7 @@
     line: "alias kubectl=\"docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro 
           {{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} 
           /hyperkube kubectl 
-          --server http://{{ ansible_enp0s8.ipv4.address }}:8080 
+          --server https://{{ ansible_enp0s8.ipv4.address }}:443 
           --certificate-authority=/etc/kubernetes/ssl/ca.pem 
           --client-certificate=/etc/kubernetes/ssl//host-{{ ansible_hostname }}.pem 
           --client-key=/etc/kubernetes/ssl/host-{{ ansible_hostname }}-key.pem\""
