@@ -29,6 +29,9 @@ docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v ${PWD}:/mou
 * Add some addons like logging (fluentd, etc)
 * Metrics with node exporter and prometheus (https://coreos.com/blog/prometheus-and-kubernetes-up-and-running.html)
 
+## Issues:
+* Nginx (and other) ingress controller doesnt work with cni: https://github.com/kubernetes/kubernetes/issues/23920
+
 ## usefull stuff
 
 * [https://storage.googleapis.com/kubernetes-release/release/stable.txt](kubernetes version number)

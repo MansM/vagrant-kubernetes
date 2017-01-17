@@ -23,7 +23,6 @@
 - name: copy flannel docker config
   copy: src=40-flannel.conf dest=/etc/systemd/system/docker.service.d/40-flannel.conf
   notify: 
-    - daemon-reload
     - restart docker
 
 - name: create folders
@@ -57,8 +56,6 @@
   template: src=canal.yaml.j2 dest=/root/canal.yaml
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
-
-
 - wait_for:
     host: "{{ ansible_enp0s8.ipv4.address }}"
     port: 443
@@ -69,4 +66,7 @@
   args:
     executable: /bin/bash
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+
+- name: triggering handlers
+  meta: flush_handlers
 

@@ -1,7 +1,4 @@
 ---
 # handlers file for flannel
-- name: daemon-reload
-  shell: systemctl daemon-reload
-
 - name: restart docker
-  service: name=docker state=restarted
+  systemd: name=docker state=restarted daemon_reload=yes

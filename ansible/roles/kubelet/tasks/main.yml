@@ -14,8 +14,10 @@
 - name: add kubeletservice
   template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service
   notify:
-    - daemon-reload
     - restart kubelet
 
 - name: start and enable kubelet service
   service: name=kubelet state=started enabled=yes
+
+- name: triggering handlers
+  meta: flush_handlers
