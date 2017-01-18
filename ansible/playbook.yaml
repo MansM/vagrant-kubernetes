@@ -5,6 +5,9 @@
     - name: disable selinux
       selinux:
         state: disabled
+    - name: "setting network fact (Vagrant: enp0s8, otherwise enp0s3)"
+      set_fact: 
+        ipv4address: "{{ ansible_enp0s8.ipv4.address }}"
         
 - hosts: manager1
   become: yes

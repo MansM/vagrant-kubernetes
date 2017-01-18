@@ -57,15 +57,15 @@
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - wait_for:
-    host: "{{ ansible_enp0s8.ipv4.address }}"
+    host: "{{ ipv4address }}"
     port: 443
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
-- name: setup canal
-  shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ansible_enp0s8.ipv4.address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
-  args:
-    executable: /bin/bash
-  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+# - name: setup canal
+#   shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ipv4address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
+#   args:
+#     executable: /bin/bash
+#   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
 - name: triggering handlers
   meta: flush_handlers

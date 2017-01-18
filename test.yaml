@@ -1,9 +1,24 @@
 - hosts: all
-  become: ye
+  become: yes
   vars:
-    nic: enp0s8
-    ip: "ansible_{{ nic }}.ipv4.address"
-
+    - deployment: "vagrant"
   tasks:
+    - name: setting network fact (Vagrant)
+      set_fact: 
+        ipv4address: "{{ ansible_enp0s8.ipv4.address }}"
+      when: 'deployment == "vagrant"'
+
+    - name: setting network fact (Other)
+      set_fact: 
+        ipv4address: "{{ ansible_enp0s8.ipv4.address }}"
+      when: 'deployment != "vagrant"'
+
     - debug:
-        msg: "{{ {{ ip }} }}"
+        msg: "{{ ipv4address }}"
+
+
+- hosts: all
+  become: yes
+  tasks:
+   - debug:
+        msg: "{{ ipv4address }}"

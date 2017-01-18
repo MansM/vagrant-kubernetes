@@ -31,6 +31,8 @@ docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v ${PWD}:/mou
 
 ## Issues:
 * Nginx (and other) ingress controller doesnt work with cni: https://github.com/kubernetes/kubernetes/issues/23920
+* vagrant & real world use different NIC's
+* Using more then 2 manager nodes, requires you to start with 2 and add one by one 
 
 ## usefull stuff
 
