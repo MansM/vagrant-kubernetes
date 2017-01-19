@@ -11,7 +11,7 @@
 
 - name: get kubelet
   get_url: 
-    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/amd64/{{ item }}"
+    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes_version }}/bin/linux/{{ arch }}/{{ item }}"
     dest: "/var/www/html/kubernetes/{{ kubernetes_version }}/{{ item }}"
   retries: 5
   register: get_url_result
@@ -35,10 +35,13 @@
     - calico
     - calico-ipam
 
-- name: get cni lo
+- name: create cni dir
+  file: path=/var/www/html/cni/ state=directory
+
+- name: get cni bins
   get_url: 
-    url: "https://github.com/containernetworking/cni/releases/download/v0.3.0/cni-v0.3.0.tgz"
-    dest: "/var/www/html/calico/cni-v0.3.0.tgz"
+    url: "https://github.com/containernetworking/cni/releases/download/{{ cni_version }}/cni-{{ arch }}-{{ cni_version }}.tgz"
+    dest: "/var/www/html/cni/cni-{{ cni_version }}.tgz"
   retries: 5
   register: get_url_result
   until: get_url_result | succeeded
@@ -48,8 +51,8 @@
 
 - name: download flannel binaries
   get_url:
-    url: "https://github.com/coreos/flannel/releases/download/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz"
-    dest: /var/www/html/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz
+    url: "https://github.com/coreos/flannel/releases/download/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-{{ arch }}.tar.gz"
+    dest: /var/www/html/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-{{ arch }}.tar.gz
   retries: 5
   register: get_url_result
   until: get_url_result | succeeded

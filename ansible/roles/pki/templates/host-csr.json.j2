@@ -3,7 +3,8 @@
   "hosts": [
     "{{ ansible_hostname }}",
     "{{ ansible_enp0s8['ipv4']['address'] }}",
-    "kubernetes.default"
+    "kubernetes.default",
+    "10.3.0.1"
   ],
   "key": {
     "algo": "rsa",

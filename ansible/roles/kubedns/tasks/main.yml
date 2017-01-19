@@ -1,0 +1,8 @@
+---
+# tasks file for kubedns
+- name: put kubedns yaml files to manager1
+  template: src={{ item }}.j2 dest=/root/{{ item }}
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+  with_items:
+   - kube-dns-deployment.yaml
+   - kube-dns.yaml

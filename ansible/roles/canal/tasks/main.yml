@@ -9,7 +9,7 @@
     state: present
 
 - name: getting the binaries
-  unarchive: src="http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-amd64.tar.gz" dest=/usr/bin copy=no owner=root
+  unarchive: src="http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/flannel/{{ flannel_version }}/flannel-{{ flannel_version }}-linux-{{ arch }}.tar.gz" dest=/usr/bin copy=no owner=root
 
 - name: docker additional service dir
   file: path=/etc/systemd/system/docker.service.d state=directory
@@ -19,6 +19,8 @@
 
 - name: set sysconfig
   template: src=sysconfig.j2 dest=/etc/sysconfig/flannel
+  notify:
+   - restart flannel
 
 - name: copy flannel docker config
   copy: src=40-flannel.conf dest=/etc/systemd/system/docker.service.d/40-flannel.conf
@@ -61,8 +63,11 @@
     port: 443
   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
 
+- name: put cni plugins into the correct folder
+  unarchive: src=http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/cni/cni-{{ cni_version }}.tgz dest=/opt/cni/bin/ remote_src=yes
+
 # - name: setup canal
-#   shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ipv4address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
+#   shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-{{ arch }}:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ipv4address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/canal.yaml"
 #   args:
 #     executable: /bin/bash
 #   when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"

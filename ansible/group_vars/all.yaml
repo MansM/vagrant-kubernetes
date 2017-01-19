@@ -1,16 +1,18 @@
 docker_images:
   - "quay.io/coreos/etcd:{{ etcd_version }}"
-  - "gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }}"
-  - "quay.io/coreos/flannel:{{ flannel_version }}"
-  - "quay.io/calico/node:{{ calico_node_version }}"
-  - "calico/cni:{{ calico_cni_version }}"
-  - "calico/kube-policy-controller:{{ calico_kpc_version }}"
+  - "gcr.io/google_containers/hyperkube-{{ arch }}:{{ kubernetes_version }}"
+  # - "quay.io/coreos/flannel:{{ flannel_version }}"
+  # - "quay.io/calico/node:{{ calico_node_version }}"
+  # - "calico/cni:{{ calico_cni_version }}"
+  # - "calico/kube-policy-controller:{{ calico_kpc_version }}"
 
+arch: amd64
 etcd_version: v3.0.16
 kubernetes_version: v1.5.2
 flannel_version: v0.7.0
 calico_version: v1.5.5
 calico_node_version: v1.0.0
+cni_version: v0.4.0
 
 calico_cni_version: v1.5.5
 calico_kpc_version: v0.5.1

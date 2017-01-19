@@ -233,7 +233,13 @@ spec:
             - mountPath: /etc/kubernetes/ssl
               name: ssl-certs-kubernetes
               readOnly: true
+            - mountPath: /kubeconfig.yaml
+              name: kubeconfig
+              readOnly: true
       volumes:
         - hostPath:
             path: /etc/kubernetes/ssl
           name: ssl-certs-kubernetes
+        - name: "kubeconfig"
+          hostPath:
+            path: "/etc/kubernetes/kubeconfig.yaml"

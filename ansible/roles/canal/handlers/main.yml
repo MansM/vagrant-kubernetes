@@ -2,3 +2,6 @@
 # handlers file for flannel
 - name: restart docker
   systemd: name=docker state=restarted daemon_reload=yes
+
+- name: restart flannel
+  systemd: name=flannel state=restarted daemon_reload=yes
