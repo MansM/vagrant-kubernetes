@@ -24,6 +24,17 @@ kubectl create -f /mount/whatever.yaml
 docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v ${PWD}:/mount manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.2 /hyperkube kubectl --server https://172.16.50.11 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem create -f /mount/canal.yaml
 ```
 
+when kubedns has issues with credentials:
+```
+kubectl delete -f /mount/kube-dns.yaml && kubectl delete -f /mount/kube-dns-deployment.yaml
+
+- grab coffee - 
+
+kubectl -n kube-system get secrets |tail -1 |awk {'print $1'}|xargs docker run --rm -t -v /root:/mount -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro manager1:5000/gcr.io/google_containers/hyperkube-amd64:v1.5.2 /hyperkube kubectl --server https://172.16.50.11:443 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl//host-manager1.pem --client-key=/etc/kubernetes/ssl/host-manager1-key.pem  -n kube-system delete secret && kubectl create -f /mount/kube-dns.yaml && kubectl create -f /mount/kube-dns-deployment.yaml
+```
+
+
+
 ## Todo:
 * Implement ServiceAccounts for nginx ingress controller
 * Add some addons like logging (fluentd, etc)
