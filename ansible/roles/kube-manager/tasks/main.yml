@@ -6,7 +6,7 @@
 - name: kubectl alias in profile
   lineinfile: 
     dest: /root/.bash_profile
-    line: "alias kubectl=\"docker run --rm -it -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro 
+    line: "alias kubectl=\"docker run --rm -it -v /root:/mount -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro 
           {{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/gcr.io/google_containers/hyperkube-amd64:{{ kubernetes_version }} 
           /hyperkube kubectl 
           --server https://{{ ansible_enp0s8.ipv4.address }}:443 
@@ -24,7 +24,7 @@
   with_items:
     - scheduler
     - controller-manager
-#    - proxy
+    - proxy
 #    - apiserver
 
 - name: get kubernetes binaries

@@ -5,6 +5,11 @@
     url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/kubelet"
     dest: /usr/bin/kubelet
 
+- name: kubeconfig dir
+  file: path=/etc/kubernetes/ state=directory
+- name: kube-worker config
+  template: src=kubeconfig.yaml.j2 dest=/etc/kubernetes/kubeconfig.yaml
+
 - name: set permissions for kubelet
   file: path=/usr/bin/kubelet mode=0755
 

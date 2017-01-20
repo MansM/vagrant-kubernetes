@@ -36,3 +36,7 @@
     - kube-worker
     - canal
 
+- hosts: manager1
+  become: yes
+  roles:
+    - kubedns

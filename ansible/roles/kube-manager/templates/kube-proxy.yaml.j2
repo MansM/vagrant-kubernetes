@@ -11,22 +11,30 @@ spec:
     command:
     - /hyperkube
     - proxy
-    - --master=http://{{ ansible_enp0s8.ipv4.address }}:8080
+    - --master=https://172.16.50.11:443
+    - --kubeconfig={{ kube_config }}
+    - --hostname-override={{ ansible_hostname }}
+    - --bind-address=0.0.0.0
     - --proxy-mode=iptables
     - --v={{ loglevel }}
     securityContext:
       privileged: true
     volumeMounts:
     - mountPath: /etc/ssl/certs
-      name: ssl-certs-host
-      readOnly: true
+      name: "ssl-certs"
     - mountPath: /etc/kubernetes/kubeconfig.yaml
-      name: etc-kubernetes-kubeconfig
+      name: "kubeconfig"
+      readOnly: true
+    - mountPath: /etc/kubernetes/ssl
+      name: "etc-kube-ssl"
       readOnly: true
   volumes:
-  - hostPath:
-      path: /usr/share/ca-certificates
-    name: ssl-certs-host
-  - hostPath:
-      path: /etc/kubernetes/kubeconfig.yaml
-    name: etc-kubernetes-kubeconfig
+  - name: "ssl-certs"
+    hostPath:
+      path: "/usr/share/ca-certificates"
+  - name: "kubeconfig"
+    hostPath:
+      path: "/etc/kubernetes/kubeconfig.yaml"
+  - name: "etc-kube-ssl"
+    hostPath:
+      path: "/etc/kubernetes/ssl"
