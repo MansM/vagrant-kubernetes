@@ -7,7 +7,7 @@ ExecStart=/usr/bin/kube-proxy \
   --master=https://172.16.50.11:443 \
   --kubeconfig={{ kube_config }} \
   --hostname-override={{ ansible_hostname }} \
-  --proxy-mode=iptables \
+  --proxy-mode={{ proxy_mode }} \
   --cluster-cidr=10.200.0.0/24 \
   --v={{ loglevel }}
 
