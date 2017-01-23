@@ -29,5 +29,14 @@
 - name: docker service starten en enablen
   service: name=docker enabled=yes state=started
 
+- name: add br_netfilter to rc.modules
+  lineinfile: dest=/etc/rc.modules line=br_netfilter state=present create=yes
+
+- name: create /etc/rc/modules
+  file: path=/etc/rc.modules state=file mode=755 owner=root
+
+- name: load br_netfilter
+  modprobe: name=br_netfilter state=present
+
 - name: triggering handlers
   meta: flush_handlers

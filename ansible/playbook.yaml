@@ -22,7 +22,16 @@
     - docker
     - docker-registry
     - kubelet
+    
+- hosts: managers
+  become: yes
+  serial: 1
+  roles:   
     - etcd
+
+- hosts: managers
+  become: yes
+  roles:
     - kube-manager
     - canal
 
