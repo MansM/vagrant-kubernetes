@@ -13,7 +13,7 @@ spec:
         - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
           value: https://{{ ansible_enp0s8.ipv4.address }}:2380
         - name: ETCD_INITIAL_CLUSTER
-          value: "manager1=https://{{ hostvars[groups['managers'][0]]['ansible_enp0s8']['ipv4']['address'] }}:2380,{{ ansible_hostname}}=https://{{ ansible_enp0s8.ipv4.address }}:2380"
+          value: {{ etcd_data.stdout_lines[3].split("ETCD_INITIAL_CLUSTER=")[1] }}
         - name: ETCD_INITIAL_CLUSTER_STATE
           value: existing
         - name: ETCD_LISTEN_CLIENT_URLS

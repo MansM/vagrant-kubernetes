@@ -6,3 +6,12 @@
   with_items:
    - kube-dns-deployment.yaml
    - kube-dns.yaml
+
+- name: setup kubedns
+  shell: "/bin/docker run --rm -i -v /etc/kubernetes/ssl:/etc/kubernetes/ssl:ro -v /root:/mount manager1:5000/gcr.io/google_containers/hyperkube-{{ arch }}:{{ kubernetes_version }} /hyperkube kubectl --server https://{{ ipv4address }} --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/host.pem --client-key=/etc/kubernetes/ssl/host-key.pem apply -f /mount/{{ item }}.yaml"
+  args:
+    executable: /bin/bash
+  when: "ansible_hostname == hostvars[groups['managers'][0]]['ansible_hostname']"
+  with_items:
+   - kube-dns-deployment
+   - kube-dns

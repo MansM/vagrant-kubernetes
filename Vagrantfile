@@ -1,4 +1,4 @@
-MANAGERINSTANCES = 2
+MANAGERINSTANCES = 3
 WORKERINSTANCES = 1
 
 Vagrant.configure(2) do |config|

@@ -42,7 +42,8 @@
 
 - name: put etcd in kubeletfolder
   template: src=etcd-secondary.yaml.j2 dest=/etc/kubelet.d/etcd.yaml
-  when: "ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname']"
+  when: "{{ groups['managers'] | length }} > 1 and ansible_hostname != hostvars[groups['managers'][0]]['ansible_hostname'] and 
+        etcd_members.stdout.find( ansible_hostname ) == -1" 
 
 - name: etcdctl alias in profile
   lineinfile: 
