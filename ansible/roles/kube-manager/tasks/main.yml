@@ -25,29 +25,29 @@
     - scheduler
     - controller-manager
     - proxy
-#    - apiserver
+    - apiserver
 
-- name: get kubernetes binaries
-  get_url: 
-    url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/{{ item }}"
-    dest: /usr/bin/{{ item }}
-  with_items:
-    - kube-apiserver
+# - name: get kubernetes binaries
+#   get_url: 
+#     url: "http://{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}/kubernetes/{{ kubernetes_version }}/{{ item }}"
+#     dest: /usr/bin/{{ item }}
+#   with_items:
+#     - kube-apiserver
 
-- name: set permissions for binaries
-  file: path=/usr/bin/{{ item }} mode=0755
-  with_items:
-    - kube-apiserver
+# - name: set permissions for binaries
+#   file: path=/usr/bin/{{ item }} mode=0755
+#   with_items:
+#     - kube-apiserver
 
-- name: add services 
-  template: src={{ item }}.service.j2 dest=/usr/lib/systemd/system/{{ item }}.service
-  notify:
-    - daemon-reload
-    - "restart {{ item }}"
-  with_items:
-    - kube-apiserver
+# - name: add services 
+#   template: src={{ item }}.service.j2 dest=/usr/lib/systemd/system/{{ item }}.service
+#   notify:
+#     - daemon-reload
+#     - "restart {{ item }}"
+#   with_items:
+#     - kube-apiserver
 
-- name: services starten
-  service: name={{ item }} state=started enabled=yes
-  with_items:
-    - kube-apiserver 
+# - name: services starten
+#   service: name={{ item }} state=started enabled=yes
+#   with_items:
+#     - kube-apiserver 

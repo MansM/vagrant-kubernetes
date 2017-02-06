@@ -2,3 +2,5 @@ pki/*.*
 !pki/.gitkeep
 .vagrant
 *.retry
+.kitchen/
+.kitchen.local.yml

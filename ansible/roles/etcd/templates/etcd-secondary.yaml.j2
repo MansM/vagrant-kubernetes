@@ -9,9 +9,9 @@ spec:
       image: "{{ hostvars[groups['managers'][0]]['ansible_hostname'] }}:5000/quay.io/coreos/etcd:{{ etcd_version }}"
       env:
         - name: ETCD_ADVERTISE_CLIENT_URLS
-          value: https://{{ ansible_enp0s8.ipv4.address }}:2379
+          value: https://{{ ipv4address }}:2379
         - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
-          value: https://{{ ansible_enp0s8.ipv4.address }}:2380
+          value: https://{{ ipv4address }}:2380
         - name: ETCD_INITIAL_CLUSTER
           value: {{ etcd_data.stdout_lines[3].split("ETCD_INITIAL_CLUSTER=")[1] }}
         - name: ETCD_INITIAL_CLUSTER_STATE

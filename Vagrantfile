@@ -19,7 +19,7 @@ Vagrant.configure(2) do |config|
 
       if i+1 == MANAGERINSTANCES
         vmconfig.vm.provision :ansible do |ansible|
-          ansible.playbook = "ansible/playbook.yaml"
+          ansible.playbook = "./ansible/playbook.yaml"
           ansible.sudo = true
           ansible.verbose = "v"
           ansible.host_key_checking = false
@@ -40,7 +40,7 @@ Vagrant.configure(2) do |config|
 
       if i+1 == WORKERINSTANCES
         vmconfig.vm.provision :ansible do |ansible|
-          ansible.playbook = "ansible/playbook.yaml"
+          ansible.playbook = "./ansible/playbook.yaml"
           ansible.sudo = true
           ansible.verbose = "v"
           ansible.host_key_checking = false

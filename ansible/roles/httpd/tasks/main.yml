@@ -18,8 +18,6 @@
   until: get_url_result | succeeded
   with_items:
     - kubelet
-    - kube-apiserver
-    - kube-proxy
 
 - name: create calico version dir
   file: path=/var/www/html/calico/{{ calico_version }} state=directory
